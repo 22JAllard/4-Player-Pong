@@ -31,8 +31,8 @@ bat3.x
 bat4.x
 bat1.y = 150
 bat2.y = 150
-bat3.y = 150
-bat4.y = 150
+bat3.y = 150 
+bat4.y = 150 #could be the issue
 ball_speedx = 5
 ball_speedy = 5
 
