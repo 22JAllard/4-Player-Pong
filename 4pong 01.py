@@ -55,10 +55,25 @@ ball = pygame.Rect(width // 2, height // 2, ballradius, ballradius)
 run = True
 while run:
     screen.fill(black)
-    pygame.draw.rect(screen, white, bat1)
-    pygame.draw.rect(screen, white, bat2)
-    pygame.draw.rect(screen, white, bat3)
-    pygame.draw.rect(screen, white, bat4)
+    #display scores
+    left_score_text = font.render("Left Score = " + "♥" * left_score, True, white)
+    right_score_text = font.render("Right Score = " + "♥" * right_score, True, white)
+    top_score_text = font.render("Top Score = " + "♥" * top_score, True, white)
+    bottom_score_text = font.render("Bottom Score = " + "♥" * bottom_score, True, white)
+
+    screen.blit(left_score_text, ((10, 10)))
+    screen.blit(right_score_text, ((990 - (right_score_text.get_width ()), 990 - (bottom_score_text.get_height()))))
+    screen.blit(top_score_text, ((990 - (top_score_text.get_width ()), 10))) 
+    screen.blit(bottom_score_text, ((10 , 990 - (bottom_score_text.get_height()))))
+
+    if left_score != 0:
+        pygame.draw.rect(screen, white, bat1)
+    if right_score != 0:
+        pygame.draw.rect(screen, white, bat2)
+    if top_score != 0:
+        pygame.draw.rect(screen, white, bat3)
+    if bottom_score != 0:
+        pygame.draw.rect(screen, white, bat4)
     pygame.draw.circle(screen, (white), (ball.x, ball.y), ballradius, ballradius)
     pygame.display.flip()
 
@@ -73,11 +88,15 @@ while run:
     if key[pygame.K_w]:
         if bat1.y <= 0:
             bat1.y = 0
+        elif bat1.colliderect(bat3) or bat1.colliderect(bat4):
+            bat1.y = bat1.y + bat_speed
         else:
             bat1.y -= bat_speed
     if key[pygame.K_s]:
         if bat1.y >= height - bat_size_a:
             bat1.y = height - bat_size_a
+        elif bat1.colliderect(bat3) or bat1.colliderect(bat4):
+            bat1.y = bat1.y - bat_speed
         else:
             bat1.y += bat_speed
 
@@ -85,35 +104,47 @@ while run:
     if key[pygame.K_UP]:
         if bat2.y <= 0:
             bat2.y = 0
+        elif bat2.colliderect(bat3) or bat2.colliderect(bat4):
+            bat2.y = bat2.y + bat_speed
         else:
             bat2.y -= bat_speed
     if key[pygame.K_DOWN]:
         if bat2.y >= height - bat_size_a:
             bat2.y = height - bat_size_a
+        elif bat2.colliderect(bat3) or bat2.colliderect(bat4):
+            bat2.y = bat2.y - bat_speed
         else:
             bat2.y += bat_speed
 
     #top bat
-    if key[pygame.K_c]:
+    if key[pygame.K_o]:
         if bat3.x <= 0:
             bat3.x = 0
+        elif bat3.colliderect(bat1) or bat3.colliderect(bat2):
+            bat3.x = bat3.x + bat_speed
         else:
             bat3.x -= bat_speed
-    if key[pygame.K_v]:
+    if key[pygame.K_p]:
         if bat3.x >= width - bat_size_a:
             bat3.x = width - bat_size_a
+        elif bat3.colliderect(bat1) or bat3.colliderect(bat2):
+            bat3.x = bat3.x - bat_speed
         else:
             bat3.x += bat_speed
         
     #bottom bat
-    if key[pygame.K_o]:
+    if key[pygame.K_v]:
         if bat4.x <= 0:
             bat4.x = 0
+        elif bat4.colliderect(bat1) or bat4.colliderect(bat2):
+            bat4.x = bat4.x + bat_speed
         else:
             bat4.x -= bat_speed
-    if key[pygame.K_p]:
+    if key[pygame.K_b]:
         if bat4.x >= width - bat_size_a:
             bat4.x = width - bat_size_a
+        elif bat4.colliderect(bat1) or bat4.colliderect(bat2):
+            bat4.x = bat4.x - bat_speed
         else:
             bat4.x += bat_speed
 
@@ -121,53 +152,50 @@ while run:
     ball.x += ball_speedx 
     ball.y += ball_speedy 
 
-    #if ball.colliderect(bat3) or ball.colliderect(bat4)
-
-    #bat collision
-    if ball.colliderect(bat1) or ball.colliderect(bat2):
+    #bat/ball collision
+    if ball.colliderect(bat1) and left_score != 0:
         ball_speedx = -ball_speedx
-    if ball.colliderect(bat3) or ball.colliderect(bat4):
+    if ball.colliderect(bat2) and right_score != 0:
+        ball_speedx = -ball_speedx
+    if ball.colliderect(bat3) and top_score != 0:
+        ball_speedy = -ball_speedy
+    if ball.colliderect(bat4) and bottom_score != 0:
         ball_speedy = -ball_speedy
 
     #scoring
     #left
-    if ball.x == 0:
+    if ball.x == 0 and left_score != 0:
         left_score -= 1
-        ball.x = 500
-        ball.y = 500
+    elif left_score == 0 and ball.x == 0:
+        ball_speedx = -ball_speedx
 
     #right
-    if ball.x == 1000:
+    if ball.x == 1000 and right_score != 0:
         right_score -= 1
-        ball.x = 500
-        ball.y = 500
-
+    elif right_score == 0 and ball.x == 1000:
+        ball_speedx = -ball_speedx
+    
     #top
-    if ball.y == 0:
-        top_score -=1
+    if ball.y == 0 and top_score != 0:
+        top_score -= 1
+    elif top_score == 0 and ball.y == 1000:
+        ball_speedy = -ball_speedy
+    
+    #bottom
+    if ball.y == 1000 and bottom_score != 0:
+        bottom_score -= 1
+    elif top_score == 0 and ball.y == 1000:
+        ball_speedy = -ball_speedy
+
+    if (ball.x < 0 or ball.x > 1000 or ball.y < 0 or ball.y > 1000) and key[pygame.K_SPACE]:
         ball.x = 500
         ball.y = 500
+        ball_speedx = -ball_speedx
+        ball_speedy = -ball_speedy
 
-    #bottom
-    if ball.y == 1000:
-        top_score -=1
-        ball.x = 500   
-        ball.y = 500
- 
     if left_score == 0 and right_score == 0 and top_score == 0 and bottom_score == 0:
         pygame.quit()
         sys.exit()    
-
-    #display scores
-    left_score_text = font.render("Left Score = " + "♥" * left_score, True, white)
-    right_score_text = font.render("Right Score = " + "♥" * right_score, True, white)
-    top_score_text = font.render("Top Score = " + "♥" * top_score, True, white)
-    bottom_score_text = font.render("Bottom Score = " + "♥" * bottom_score, True, white)
-
-    screen.blit(left_score_text, ((10, 10)))
-    screen.blit(right_score_text, ((990 - (right_score_text.get_width ()), 990 - (bottom_score_text.get_height()))))
-    screen.blit(top_score_text, ((990 - (top_score_text.get_width ()), 10))) 
-    screen.blit(bottom_score_text, ((10 , 990 - (bottom_score_text.get_height())))) 
 
     pygame.display.flip()
     pygame.display.update()
