@@ -9,6 +9,10 @@ height = 1000
 fps=60
 white = (255, 255, 255)
 black = (0, 0, 0)
+yellow = (255, 255, 0)
+green = (0, 255, 0)
+blue = (0, 0, 255)
+red = (255, 0, 0)
 
 #create screen
 screen = pygame.display.set_mode((width, height))
@@ -56,10 +60,51 @@ run = True
 while run:
     screen.fill(black)
     #display scores
-    left_score_text = font.render("Left Score = " + "♥" * left_score, True, white)
-    right_score_text = font.render("Right Score = " + "♥" * right_score, True, white)
-    top_score_text = font.render("Top Score = " + "♥" * top_score, True, white)
-    bottom_score_text = font.render("Bottom Score = " + "♥" * bottom_score, True, white)
+    left_score_text = font.render("Lives = " + str(left_score), True, red)
+    right_score_text = font.render("Lives = " + str(right_score), True, blue)
+    top_score_text = font.render("Lives = " + str(top_score), True, green)
+    bottom_score_text = font.render("Lives = " + str(bottom_score), True, yellow)
+
+    #scoring
+    #left
+    if ball.x == 0:
+        left_score -= 1
+        ball_speedx = 0
+        ball_speedy = 0
+        ball.x = 500
+        ball.y = 500
+    if left_score == 0:
+        ball_speedx = -ball_speedx
+
+    #right
+    if ball.x == 1000:
+        right_score -= 1
+        ball_speedx = 0
+        ball_speedy = 0
+        ball.x = 500
+        ball.y = 500
+    if right_score == 0:
+        ball_speedx = -ball_speedx
+    
+    #top
+    if ball.y == 0:
+        top_score -= 1
+        ball_speedx = 0
+        ball_speedy = 0
+        ball.x = 500
+        ball.y = 500
+    if top_score == 0:
+        ball_speedy = -ball_speedy
+    
+    #bottom
+    if ball.y == 1000:
+        bottom_score -= 1
+        ball_speedx = 0
+        ball_speedy = 0
+        ball.x = 500
+        ball.y = 500
+    if top_score == 0:
+        ball_speedy = -ball_speedy
 
     screen.blit(left_score_text, ((10, 10)))
     screen.blit(right_score_text, ((990 - (right_score_text.get_width ()), 990 - (bottom_score_text.get_height()))))
@@ -67,13 +112,13 @@ while run:
     screen.blit(bottom_score_text, ((10 , 990 - (bottom_score_text.get_height()))))
 
     if left_score != 0:
-        pygame.draw.rect(screen, white, bat1)
+        pygame.draw.rect(screen, red, bat1)
     if right_score != 0:
-        pygame.draw.rect(screen, white, bat2)
+        pygame.draw.rect(screen, blue, bat2)
     if top_score != 0:
-        pygame.draw.rect(screen, white, bat3)
+        pygame.draw.rect(screen, green, bat3)
     if bottom_score != 0:
-        pygame.draw.rect(screen, white, bat4)
+        pygame.draw.rect(screen, yellow, bat4)
     pygame.draw.circle(screen, (white), (ball.x, ball.y), ballradius, ballradius)
     pygame.display.flip()
 
@@ -162,37 +207,16 @@ while run:
     if ball.colliderect(bat4) and bottom_score != 0:
         ball_speedy = -ball_speedy
 
-    #scoring
-    #left
-    if ball.x == 0 and left_score != 0:
-        left_score -= 1
-    elif left_score == 0 and ball.x == 0:
-        ball_speedx = -ball_speedx
-
-    #right
-    if ball.x == 1000 and right_score != 0:
-        right_score -= 1
-    elif right_score == 0 and ball.x == 1000:
-        ball_speedx = -ball_speedx
     
-    #top
-    if ball.y == 0 and top_score != 0:
-        top_score -= 1
-    elif top_score == 0 and ball.y == 1000:
-        ball_speedy = -ball_speedy
-    
-    #bottom
-    if ball.y == 1000 and bottom_score != 0:
-        bottom_score -= 1
-    elif top_score == 0 and ball.y == 1000:
-        ball_speedy = -ball_speedy
 
-    if (ball.x < 0 or ball.x > 1000 or ball.y < 0 or ball.y > 1000) and key[pygame.K_SPACE]:
-        ball.x = 500
-        ball.y = 500
-        ball_speedx = -ball_speedx
-        ball_speedy = -ball_speedy
+    #respawning balls
+    if key[pygame.K_SPACE]:
+        ran_x = random.randint(1, 10)
+        ran_y = random.randint(1, 10)
+        ball_speedx = 1 * ran_x
+        ball_speedy = 1 * ran_y
 
+    #ending game
     if left_score == 0 and right_score == 0 and top_score == 0 and bottom_score == 0:
         pygame.quit()
         sys.exit()    
