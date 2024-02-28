@@ -13,6 +13,7 @@ yellow = (255, 255, 0)
 green = (0, 255, 0)
 blue = (0, 0, 255)
 red = (255, 0, 0)
+scored = False
 
 #create screen
 screen = pygame.display.set_mode((width, height))
@@ -67,58 +68,62 @@ while run:
 
     #scoring
     #left
-    if ball.x == 0:
+    if ball.x <= 0 and scored == False and left_score >= 0:
         left_score -= 1
         ball_speedx = 0
         ball_speedy = 0
         ball.x = 500
         ball.y = 500
-    if left_score == 0:
+        scored = True
+    if left_score <= 0:
         ball_speedx = -ball_speedx
 
     #right
-    if ball.x == 1000:
+    if ball.x >= 1000 and scored == False and right_score >= 0:
         right_score -= 1
         ball_speedx = 0
         ball_speedy = 0
         ball.x = 500
         ball.y = 500
-    if right_score == 0:
+        scored = True
+    if right_score <= 0:
         ball_speedx = -ball_speedx
     
     #top
-    if ball.y == 0:
+    if ball.y <= 0 and scored == False and top_score >= 0:
         top_score -= 1
         ball_speedx = 0
         ball_speedy = 0
         ball.x = 500
         ball.y = 500
-    if top_score == 0:
+        scored = True
+    if top_score <= 0:
         ball_speedy = -ball_speedy
     
     #bottom
-    if ball.y == 1000:
+    if ball.y >= 1000  and scored == False and bottom_score >= 0:
         bottom_score -= 1
         ball_speedx = 0
         ball_speedy = 0
         ball.x = 500
         ball.y = 500
-    if top_score == 0:
+        scored = True
+    if top_score <= 0:
         ball_speedy = -ball_speedy
 
-    screen.blit(left_score_text, ((10, 10)))
-    screen.blit(right_score_text, ((990 - (right_score_text.get_width ()), 990 - (bottom_score_text.get_height()))))
-    screen.blit(top_score_text, ((990 - (top_score_text.get_width ()), 10))) 
-    screen.blit(bottom_score_text, ((10 , 990 - (bottom_score_text.get_height()))))
-
-    if left_score != 0:
+    #drawing bat and score
+    if left_score >= 0:
         pygame.draw.rect(screen, red, bat1)
-    if right_score != 0:
+        screen.blit(left_score_text, ((10, 10)))
+    if right_score >= 0:
         pygame.draw.rect(screen, blue, bat2)
-    if top_score != 0:
+        screen.blit(right_score_text, ((990 - (right_score_text.get_width ()), 990 - (bottom_score_text.get_height()))))
+    if top_score >= 0:
         pygame.draw.rect(screen, green, bat3)
-    if bottom_score != 0:
+        screen.blit(top_score_text, ((990 - (top_score_text.get_width ()), 10)))
+    if bottom_score >= 0:
         pygame.draw.rect(screen, yellow, bat4)
+        screen.blit(bottom_score_text, ((10 , 990 - (bottom_score_text.get_height()))))
     pygame.draw.circle(screen, (white), (ball.x, ball.y), ballradius, ballradius)
     pygame.display.flip()
 
@@ -207,14 +212,23 @@ while run:
     if ball.colliderect(bat4) and bottom_score != 0:
         ball_speedy = -ball_speedy
 
-    
-
     #respawning balls
     if key[pygame.K_SPACE]:
         ran_x = random.randint(1, 10)
         ran_y = random.randint(1, 10)
         ball_speedx = 1 * ran_x
         ball_speedy = 1 * ran_y
+        scored = False
+
+    #bat/ball collision
+    if ball.x == 0 and left_score == 0:
+        ball_speedx = -ball_speedx
+    if ball.x == 1000 and right_score == 0:
+        ball_speedx = -ball_speedx
+    if ball.y == 0 and top_score == 0:
+        ball_speedy = -ball_speedy
+    if ball.y == 1000 and bottom_score == 0:
+        ball_speedy = -ball_speedy
 
     #ending game
     if left_score == 0 and right_score == 0 and top_score == 0 and bottom_score == 0:
